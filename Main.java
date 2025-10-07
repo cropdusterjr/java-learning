@@ -1,53 +1,129 @@
-// !!! MAKE NO CHANGES TO THIS FILE !!!
+// !!! Make no changes to this .java file !!!
+import java.io.*;
 import java.util.Scanner;
-public class Main {
-   private static Scanner scnr = new Scanner(System.in);
-   
-    public static void main(String[] args) {
-        // instantiate 2 Weapon objects
-        Weapon weapon1 = new Weapon("Atomic Fire Breath", 100);
-        Weapon weapon2 = new Weapon("Thunderbolt", 50);
-        // instantiate 2 Monster objects
-        Monster monster1 = new Monster("Godzilla", 100, weapon1);
-        Monster monster2 = new Monster("Pikachu", 200, weapon2);
-        // we start with round 1 of the fight
-        int round = 1;
-        // battle continues in rounds until one (or both ) monster have a health the is <= 0
-        while (monster1.getHealth() > 0 && monster2.getHealth() > 0) {
-            int damage1 = monster1.attack(monster2); // first monster attacks second monster
-            int damage2 = monster2.attack(monster1); // second monster attacks first monster
-            // report the results for this round
-            System.out.println("========================================");
-            System.out.println("Round #" + round);
-            System.out.println("----------------------------------------");
-            
-            System.out.println(monster1.getName() + " attacks " + monster2.getName() + 
-                               " with " + monster1.getWeaponName() + 
-                               ", doing " + damage1 + " points of damage.");
-            
-            System.out.println(monster2.getName() + " attacks " + monster1.getName() + 
-                               " with " + monster2.getWeaponName() + 
-                               ", doing " + damage2 + " points of damage.");
-            System.out.println("----------------------------------------");
-            System.out.println(monster1.getName() + " Health = " + monster1.getHealth());
-            System.out.println(monster2.getName() + " Health = " + monster2.getHealth());
-            // pause before advancing to the next round
-            System.out.print("\nPress ENTER to continue...");
-            scnr.nextLine();
-            // advance to the next round
-            round += 1; 
-        }
-        // we made it out of the loop because one (or both ) monster have a health the is <= 0
-        // now we must determine the winner (if there is one)
-        String winner = "No Monster";
-       
-        if (monster1.getHealth() > 0) {
-               winner = monster1.getName();
-        }
-        if (monster2.getHealth() > 0) {
-               winner = monster2.getName();
-        }
-        // report the winner
-        System.out.println("The winner is " + winner + "!");
+
+class Main {
+  static Scanner scnr = new Scanner(System.in);
+
+  public static void main(String[] args) throws IOException {
+    ClimateZone zone = new ClimateZone();
+
+    int menuChoice = 0;
+
+    while (menuChoice != 8) {
+      displayMenu();
+      menuChoice = getMenuChoice();
+
+      if      (menuChoice == 1)
+        zone = openDataFile();
+      else if (menuChoice == 2)
+        listAllCities(zone);
+      else if (menuChoice == 3)
+        listHottestCities(zone);
+      else if (menuChoice == 4)
+        listColdestCities(zone);
+      else if (menuChoice == 5)
+        addCity(zone);
+      else if (menuChoice == 6)
+        changeCityTemps(zone);
+      else if (menuChoice == 7)
+        countCities(zone);
+      else if (menuChoice == 8)
+        System.out.println("===== Quitting Program =====");
+      else
+        System.out.println("  !!! Invalid Menu Choice !!!");
     }
+  }
+
+  static void displayMenu() {
+    System.out.println("===== Menu =====");
+    System.out.println("1. Open a climate zone data file");
+    System.out.println("2. List all cities");
+    System.out.println("3. List hottest cities");
+    System.out.println("4. List coldest cities");
+    System.out.println("5. Add a city");
+    System.out.println("6. Change a city's temperatures");
+    System.out.println("7. Count cities");
+    System.out.println("8. Quit program");
+  }
+
+  static int getMenuChoice() {
+    System.out.print("Enter your menu Choice --> ");
+    return scnr.nextInt();
+  }
+
+  static ClimateZone openDataFile() throws IOException {
+    System.out.print("Enter data file name --> ");
+    String fileName = scnr.next();
+
+    return new ClimateZone(fileName);
+  }
+
+  static void listAllCities(ClimateZone zone) {
+    System.out.println("===== All Cities =====");
+    zone.printAllCities();
+  }
+
+  static void listHottestCities(ClimateZone zone) {
+    System.out.println("===== Hottest Cities =====");
+    zone.printHottestCities();
+  }
+
+  static void listColdestCities(ClimateZone zone) {
+    System.out.println("===== Coldest Cities =====");
+    zone.printColdestCities();
+  }
+
+  static void addCity(ClimateZone zone) {
+    String cityName = getCityName();
+    String stateName = getStateName();
+    double highTemp = getHighTemp();
+    double lowTemp = getLowTemp();
+
+    zone.addCity(cityName, stateName, highTemp, lowTemp);
+  }
+
+  static void changeCityTemps(ClimateZone zone) {
+    String cityName = getCityName();
+    String stateName = getStateName();
+
+    City cityToUpdate = zone.getCityByName(cityName, stateName);
+
+    if (cityToUpdate != null) {
+      double highTemp = getHighTemp();
+      double lowTemp = getLowTemp();
+
+      cityToUpdate.setHighTemp(highTemp);
+      cityToUpdate.setLowTemp(lowTemp);
+    } else {
+      System.out.printf("  !!! No city with the name %s, %s found !!!\n", cityName, stateName);
+    }
+  }
+
+  static void countCities(ClimateZone zone) {
+    System.out.printf("There are %d cities in this data set.\n", zone.getCityCount());
+  }
+
+  static String getCityName() {
+    System.out.print("Enter new city name  --> ");
+    String cityName = scnr.next();
+    
+    return cityName;
+  }
+  static String getStateName() {
+    System.out.print("Enter new state name  --> ");
+    String stateName = scnr.next();
+    
+    return stateName;
+  }
+
+  static double getHighTemp() {
+    System.out.print("Enter city's new high temperature --> ");
+    return scnr.nextDouble();
+  }
+
+  static double getLowTemp() {
+    System.out.print("Enter city's new low temperature -->");
+    return scnr.nextDouble();
+  }
 }
